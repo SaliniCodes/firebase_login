@@ -10,12 +10,16 @@ import 'firebasehome.dart';
 class mainhome extends StatefulWidget {
   mainhome({super.key});
 
+
   @override
   State<mainhome> createState() => _mainhomeState();
 }
 
 class _mainhomeState extends State<mainhome> {
   List products = [];
+  TextEditingController usercontroller = TextEditingController();
+
+  TextEditingController passcontroller= TextEditingController();
 
   Future<void> fetchData() async {
     List productlist;
@@ -30,11 +34,48 @@ class _mainhomeState extends State<mainhome> {
       print("error : $e");
     }
   }
+  Future<void> setData() async {
+    try {
+      Map<String,dynamic> data ={
+        "name":usercontroller.text,
+        "number":passcontroller.text
+      };
+      var ref =
+      await FirebaseFirestore.instance.collection('contacts').add(data);
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text("data send successful"),
+          // content: const Text("You have raised a Alert Dialog Box"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                usercontroller.clear();
+                passcontroller.clear();
+                Navigator.of(ctx).pop();
+              },
+              child: Container(
+                color: Colors.green,
+                padding: const EdgeInsets.all(14),
+                child: const Text("okay"),
+              ),
+            ),
+          ],
+        ),
+      );
+
+
+
+    } catch (e) {
+      print("error : $e");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
+      child: Scaffold(floatingActionButton: FloatingActionButton(onPressed: (){},backgroundColor: Colors.pink,child:Icon(Icons.add)),
         body: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
@@ -130,11 +171,25 @@ class _mainhomeState extends State<mainhome> {
                         },
                       ),
                     ),
+              TextField(
+                controller: usercontroller,
+                decoration: InputDecoration(
+                  labelText: 'Enter your Username',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: passcontroller,
+                decoration: InputDecoration(
+                  labelText: 'Enter your Password',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
               ElevatedButton(
                 onPressed: () {
-                  FirebaseFirestore.instance
-                      .collection('productinserted')
-                      .add({'text': 'data added through app'});
+                  setData();
                 },
                 child: Text(
                   "setdata",
